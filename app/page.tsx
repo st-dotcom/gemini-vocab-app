@@ -36,16 +36,25 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic, cefrLevel: currentLevel }),
       });
+      
       const data = await res.json();
-      if (data.words) {
+      
+      if (res.ok && data.words && data.words.length > 0) {
+        // 成功した場合
         setWords(data.words);
         setCurrentIndex(0);
         setCorrectCount(0);
         setShowMeaning(false);
         setQuizState('playing');
+      } else {
+        // APIからエラーが返ってきた場合
+        console.error("API Error Details:", data);
+        alert(`エラーが発生しました: ${data.details || data.error || '単語データを取得できませんでした'}`);
       }
     } catch (error) {
-      alert('エラーが発生しました。');
+      // ネットワークエラーなど
+      console.error("Fetch Error:", error);
+      alert('サーバーとの通信に失敗しました。時間をおいて再試行してください。');
     }
     setLoading(false);
   };
@@ -68,7 +77,6 @@ export default function Home() {
     const scoreRate = correctCount / words.length;
     let levelIndex = CEFR_LEVELS.indexOf(currentLevel);
 
-    // 8割以上でレベルアップ、3割未満でレベルダウン
     if (scoreRate >= 0.8) {
       levelIndex = Math.min(CEFR_LEVELS.length - 1, levelIndex + 1);
     } else if (scoreRate < 0.3) {
@@ -77,15 +85,12 @@ export default function Home() {
 
     const newLevel = CEFR_LEVELS[levelIndex];
     setCurrentLevel(newLevel);
-    localStorage.setItem('cefrLevel', newLevel); // 学習記録を保存
+    localStorage.setItem('cefrLevel', newLevel); 
     setQuizState('result');
   };
 
   return (
-    // 背景を美しいグラデーションにし、画面全体に広げる
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-100 flex items-center justify-center p-4 sm:p-8 font-sans text-slate-800">
-      
-      {/* メインのカード部分（すりガラス風のエフェクトと柔らかな影） */}
       <div className="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white max-w-md w-full transition-all">
         
         {quizState === 'input' && (
@@ -94,7 +99,6 @@ export default function Home() {
               <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
                 AI English Vocab
               </h1>
-              {/* CEFRレベルをピル状のバッジ風に表示 */}
               <div className="inline-block px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full">
                 <p className="text-sm text-slate-600 font-medium">
                   現在のレベル: <span className="font-bold text-blue-600 ml-1">{currentLevel}</span>
@@ -127,13 +131,11 @@ export default function Home() {
 
         {quizState === 'playing' && words.length > 0 && (
           <div className="space-y-8 text-center">
-            {/* プログレス表示 */}
             <div className="flex justify-between items-center text-sm font-medium text-slate-400 px-2">
               <span>Q. {currentIndex + 1}</span>
               <span>残り {words.length - (currentIndex + 1)} 問</span>
             </div>
             
-            {/* 英単語の表示（大きく、太く） */}
             <div className="min-h-[120px] flex items-center justify-center">
               <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight break-all">
                 {words[currentIndex].word}
@@ -157,7 +159,6 @@ export default function Home() {
               </div>
             ) : (
               <div className="space-y-6 pt-2">
-                {/* 意味の表示（枠で囲って強調） */}
                 <div className="p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
                   <p className="text-2xl font-bold text-indigo-700">{words[currentIndex].meaning}</p>
                 </div>
