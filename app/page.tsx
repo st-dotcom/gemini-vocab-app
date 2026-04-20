@@ -80,7 +80,7 @@ export default function Home() {
 
   return (
     // スタイリッシュなバイオレット系のグラデーション背景
-    <div className="min-h-screen bg-gradient-to-tr from-violet-600 via-indigo-600 to-rose-500 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-tr from-violet-600 via-indigo-600 to-rose-500 flex items-center justify-center p-4 font-sans animate-reveal">
       
       <div className="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-[2.5rem] shadow-2xl max-w-md w-full transition-all border border-white/20">
         
