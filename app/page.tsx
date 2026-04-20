@@ -65,7 +65,7 @@ export default function Home() {
   };
 
   const finishQuiz = () => {
-    const scoreRate = correctCount / words.length; // 通常は / 15
+    const scoreRate = correctCount / words.length;
     let levelIndex = CEFR_LEVELS.indexOf(currentLevel);
 
     // 8割以上でレベルアップ、3割未満でレベルダウン
@@ -82,44 +82,89 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+    // 背景を美しいグラデーションにし、画面全体に広げる
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-100 flex items-center justify-center p-4 sm:p-8 font-sans text-slate-800">
+      
+      {/* メインのカード部分（すりガラス風のエフェクトと柔らかな影） */}
+      <div className="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white max-w-md w-full transition-all">
         
         {quizState === 'input' && (
-          <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-center">AI英単語学習</h1>
-            <p className="text-center text-gray-600">現在のレベル: <span className="font-bold text-blue-600">{currentLevel}</span></p>
-            <input
-              type="text"
-              placeholder="好きな単語やテーマを入力 (例: 宇宙, 料理)"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={startQuiz}
-              disabled={loading || !topic}
-              className="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? '単語を生成中...' : '学習をスタート'}
-            </button>
+          <div className="space-y-8">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                AI English Vocab
+              </h1>
+              {/* CEFRレベルをピル状のバッジ風に表示 */}
+              <div className="inline-block px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full">
+                <p className="text-sm text-slate-600 font-medium">
+                  現在のレベル: <span className="font-bold text-blue-600 ml-1">{currentLevel}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="好きなテーマ (例: 宇宙, カフェ)"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-700 placeholder-slate-400 shadow-inner"
+              />
+              <button
+                onClick={startQuiz}
+                disabled={loading || !topic}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-xl font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <span className="animate-pulse">単語を生成中...</span>
+                ) : (
+                  '学習をスタート ✨'
+                )}
+              </button>
+            </div>
           </div>
         )}
 
         {quizState === 'playing' && words.length > 0 && (
-          <div className="space-y-6 text-center">
-            <p className="text-sm text-gray-500">{currentIndex + 1} / {words.length}</p>
-            <h2 className="text-4xl font-bold">{words[currentIndex].word}</h2>
+          <div className="space-y-8 text-center">
+            {/* プログレス表示 */}
+            <div className="flex justify-between items-center text-sm font-medium text-slate-400 px-2">
+              <span>Q. {currentIndex + 1}</span>
+              <span>残り {words.length - (currentIndex + 1)} 問</span>
+            </div>
+            
+            {/* 英単語の表示（大きく、太く） */}
+            <div className="min-h-[120px] flex items-center justify-center">
+              <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight break-all">
+                {words[currentIndex].word}
+              </h2>
+            </div>
             
             {!showMeaning ? (
-              <div className="flex justify-center gap-4 pt-4">
-                <button onClick={() => handleAnswer(false)} className="w-20 h-20 text-4xl bg-red-100 text-red-600 rounded-full hover:bg-red-200">❌</button>
-                <button onClick={() => handleAnswer(true)} className="w-20 h-20 text-4xl bg-green-100 text-green-600 rounded-full hover:bg-green-200">⭕️</button>
+              <div className="flex justify-center gap-6 pt-4">
+                <button 
+                  onClick={() => handleAnswer(false)} 
+                  className="w-20 h-20 flex items-center justify-center text-3xl bg-white border-2 border-rose-100 text-rose-500 rounded-2xl shadow-sm hover:bg-rose-50 hover:border-rose-200 hover:scale-105 active:scale-95 transition-all"
+                >
+                  ❌
+                </button>
+                <button 
+                  onClick={() => handleAnswer(true)} 
+                  className="w-20 h-20 flex items-center justify-center text-3xl bg-white border-2 border-emerald-100 text-emerald-500 rounded-2xl shadow-sm hover:bg-emerald-50 hover:border-emerald-200 hover:scale-105 active:scale-95 transition-all"
+                >
+                  ⭕️
+                </button>
               </div>
             ) : (
-              <div className="space-y-4 animate-fade-in">
-                <p className="text-2xl font-semibold text-blue-600">{words[currentIndex].meaning}</p>
-                <button onClick={nextWord} className="w-full bg-gray-800 text-white p-3 rounded font-bold hover:bg-gray-900">
+              <div className="space-y-6 pt-2">
+                {/* 意味の表示（枠で囲って強調） */}
+                <div className="p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
+                  <p className="text-2xl font-bold text-indigo-700">{words[currentIndex].meaning}</p>
+                </div>
+                <button 
+                  onClick={nextWord} 
+                  className="w-full bg-slate-800 text-white p-4 rounded-xl font-bold shadow-md hover:bg-slate-700 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                >
                   次の単語へ
                 </button>
               </div>
@@ -128,24 +173,31 @@ export default function Home() {
         )}
 
         {quizState === 'result' && (
-          <div className="space-y-6 text-center">
-            <h2 className="text-2xl font-bold">学習完了！</h2>
-            <p className="text-xl">正解数: {correctCount} / {words.length}</p>
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-gray-600">次のレベル:</p>
-              <p className="text-3xl font-bold text-blue-600">{currentLevel}</p>
+          <div className="space-y-8 text-center py-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-extrabold text-slate-800">学習完了！ 🎉</h2>
+              <p className="text-lg text-slate-600 font-medium">正解数: <span className="text-indigo-600 font-bold">{correctCount}</span> / {words.length}</p>
             </div>
+            
+            <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100/50 shadow-inner">
+              <p className="text-sm text-slate-500 font-medium mb-1">次のレベル</p>
+              <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 drop-shadow-sm">
+                {currentLevel}
+              </p>
+            </div>
+            
             <button
               onClick={() => {
                 setTopic('');
                 setQuizState('input');
               }}
-              className="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700"
+              className="w-full bg-white border-2 border-slate-200 text-slate-700 p-4 rounded-xl font-bold shadow-sm hover:border-slate-300 hover:bg-slate-50 transition-all duration-200"
             >
               ホームに戻る
             </button>
           </div>
         )}
+
       </div>
     </div>
   );
