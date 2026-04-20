@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     };
 
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash', // 安定性を重視。2.0-flashも可
+      model: 'gemini-3-flash-preview', // 安定性を重視。2.0-flashも可
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: responseSchema,
