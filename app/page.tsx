@@ -12,7 +12,7 @@ interface Word {
 
 export default function Home() {
   const [topic, setTopic] = useState('');
-  const [currentLevel, setCurrentLevel] = useState('A1');
+  const [currentLevel, setCurrentLevel] = useState('A1'); // 初期値
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -20,6 +20,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [quizState, setQuizState] = useState<'input' | 'playing' | 'result'>('input');
 
+  // ブラウザ保存のレベルを読み込む（以前の学習記録があれば）
   useEffect(() => {
     const savedLevel = localStorage.getItem('cefrLevel');
     if (savedLevel && CEFR_LEVELS.includes(savedLevel)) {
@@ -34,7 +35,7 @@ export default function Home() {
       const res = await fetch('/api/generate-words', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, cefrLevel: currentLevel }),
+        body: JSON.stringify({ topic, cefrLevel: currentLevel }), // 選択されたレベルを送信
       });
       const data = await res.json();
       
@@ -71,6 +72,8 @@ export default function Home() {
   const finishQuiz = () => {
     const scoreRate = correctCount / words.length;
     let levelIndex = CEFR_LEVELS.indexOf(currentLevel);
+    
+    // 学習後のレベル自動調整ロジック（そのまま維持）
     if (scoreRate >= 0.8) levelIndex = Math.min(CEFR_LEVELS.length - 1, levelIndex + 1);
     else if (scoreRate < 0.3) levelIndex = Math.max(0, levelIndex - 1);
 
@@ -90,46 +93,79 @@ export default function Home() {
               <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-rose-500">
                 AI英単語学習
               </h1>
-              <div className="inline-block px-4 py-1 bg-violet-50 rounded-full border border-violet-100">
-                <p className="text-xs font-bold text-violet-600 uppercase tracking-widest">Level: {currentLevel}</p>
-              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">テーマとレベルを選んで開始</p>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
+              {/* テーマ入力 */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Learning Theme</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Learning Theme</label>
                 <input
                   type="text"
-                  placeholder="例: ビジネス, 宇宙, 料理"
+                  placeholder="例: ビジネス, IT, 日常会話"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:outline-none focus:border-violet-400 focus:bg-white transition-all text-lg font-medium"
+                  className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:outline-none focus:border-violet-400 focus:bg-white transition-all text-lg font-medium shadow-inner"
                 />
               </div>
+
+              {/* レベル選択UIの追加 */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">CEFR Level</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {CEFR_LEVELS.map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => setCurrentLevel(level)}
+                      className={`py-2 rounded-xl text-sm font-bold transition-all border-2 ${
+                        currentLevel === level
+                          ? 'bg-violet-600 border-violet-600 text-white shadow-md scale-105'
+                          : 'bg-white border-slate-100 text-slate-400 hover:border-violet-200'
+                      }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-400 text-center mt-2 italic">
+                  {currentLevel === 'A1' && '初学者・基本単語'}
+                  {currentLevel === 'A2' && '日常生活・身近な話題'}
+                  {currentLevel === 'B1' && '仕事や旅行での自立した会話'}
+                  {currentLevel === 'B2' && '複雑な議論や抽象的なトピック'}
+                  {currentLevel === 'C1' && '高度で専門的な表現'}
+                  {currentLevel === 'C2' && 'ネイティブに近い最上級'}
+                </p>
+              </div>
+
               <button
                 onClick={startQuiz}
                 disabled={loading || !topic}
-                className="w-full bg-slate-900 text-white p-4 rounded-2xl font-bold shadow-xl hover:bg-violet-600 active:scale-95 transition-all duration-200 disabled:bg-slate-200"
+                className="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold shadow-xl hover:bg-violet-600 active:scale-95 transition-all duration-200 disabled:bg-slate-200"
               >
-                {loading ? 'AIが生成中...' : '学習をスタート'}
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                ) : '学習をスタート'}
               </button>
             </div>
           </div>
         )}
 
+        {/* playing 状態と result 状態は前回のコードと同じため中略（そのまま維持してください） */}
         {quizState === 'playing' && words.length > 0 && (
           <div className="space-y-8 animate-reveal">
             <div className="flex justify-between items-center text-[10px] font-black text-slate-300 tracking-widest uppercase">
               <span>Progress: {currentIndex + 1} / {words.length}</span>
               <span className="text-violet-500">{currentLevel}</span>
             </div>
-            
             <div className="text-center py-4">
-              <h2 className="text-5xl font-black text-slate-800 tracking-tighter break-words">
+              <h2 className="text-5xl font-black text-slate-800 tracking-tighter break-words leading-tight">
                 {words[currentIndex].word}
               </h2>
             </div>
-            
             {!showMeaning ? (
               <div className="grid grid-cols-2 gap-4">
                 <button onClick={() => handleAnswer(false)} className="flex flex-col items-center gap-2 p-6 bg-slate-50 rounded-3xl hover:bg-rose-50 border-2 border-transparent hover:border-rose-100 transition-all group">
@@ -176,6 +212,7 @@ export default function Home() {
             </button>
           </div>
         )}
+
       </div>
     </div>
   );
