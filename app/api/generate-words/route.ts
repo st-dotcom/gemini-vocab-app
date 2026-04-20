@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
     // モデルの指定: 最新の gemini-2.0-flash を使用
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-3.0-flash', 
+      model: 'gemini-3-flash-preview', 
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: responseSchema,
