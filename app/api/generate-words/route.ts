@@ -8,52 +8,56 @@ export async function POST(req: Request) {
   try {
     const { topic, cefrLevel } = await req.json();
     
-    // スキーマ（構造化出力）の定義
-    // ここで配列の中にオブジェクト（word, meaning）が入る形を厳密に指定します
+    // 構造化出力のスキーマ定義
     const responseSchema = {
       type: SchemaType.ARRAY,
-      description: "指定されたテーマとCEFRレベルに関連する15個の英単語リスト",
       items: {
         type: SchemaType.OBJECT,
         properties: {
           word: {
             type: SchemaType.STRING,
-            description: "英単語",
+            description: "English word",
           },
           meaning: {
             type: SchemaType.STRING,
-            description: "その英単語の日本語の意味",
+            description: "Japanese translation",
           },
         },
         required: ["word", "meaning"],
       },
     };
 
-    // モデルの初期化時に設定を渡す
+    // モデルの指定: 最新の gemini-2.0-flash を使用
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3.0-flash', 
       generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: responseSchema, // 定義したスキーマを適用
+        responseSchema: responseSchema,
       }
     });
 
     const prompt = `あなたはプロの英語教師です。ユーザーが指定したテーマ「${topic}」に関連する英単語を15個生成してください。
     難易度はCEFRの「${cefrLevel}」レベルに厳密に合わせてください。`;
 
-    // APIへリクエスト送信
     const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
     
-    // 結果を受け取り、JSONとしてパース
-    const text = result.response.text();
+    // JSONとして解析
     const words = JSON.parse(text);
 
     return NextResponse.json({ words });
-  } catch (error) {
+  } catch (error: any) {
     console.error("API実行エラー:", error);
-    // エラーの詳細をフロントエンドに返す
+    
+    // 404エラーなどの詳細な理由をフロントエンドに渡す
+    let errorMessage = '単語の生成に失敗しました';
+    if (error.message?.includes('404')) {
+      errorMessage = '指定したモデルが見つかりません。APIキーの設定やモデル名を確認してください。';
+    }
+
     return NextResponse.json(
-      { error: '単語の生成に失敗しました', details: String(error) }, 
+      { error: errorMessage, details: error.message }, 
       { status: 500 }
     );
   }
