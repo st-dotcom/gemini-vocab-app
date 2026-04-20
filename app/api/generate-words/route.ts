@@ -1,44 +1,78 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+// APIキーのチェック
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is not set in environment variables.");
+}
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(req: Request) {
   try {
     const { topic, cefrLevel } = await req.json();
-    
-    // スキーマに "example" (例文) を追加
+
+    // 1. 構造化出力（JSON）のスキーマ定義
     const responseSchema = {
       type: SchemaType.ARRAY,
+      description: "A list of English words with meanings and examples.",
       items: {
         type: SchemaType.OBJECT,
         properties: {
-          word: { type: SchemaType.STRING, description: "英単語" },
-          meaning: { type: SchemaType.STRING, description: "日本語の意味" },
-          example: { type: SchemaType.STRING, description: "その単語を使った英語の例文" },
+          word: { type: SchemaType.STRING, description: "The English word." },
+          meaning: { type: SchemaType.STRING, description: "The Japanese meaning." },
+          example: { type: SchemaType.STRING, description: "An English example sentence using the word." },
         },
         required: ["word", "meaning", "example"],
       },
     };
 
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-3-flash-preview', // 安定性を重視。2.0-flashも可
+    // 2. モデルの初期化
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: responseSchema,
-      }
+        temperature: 0.7, // 少し多様性を持たせる
+      },
     });
 
-    const prompt = `あなたはプロの英語教師です。ユーザーが指定したテーマ「${topic}」に関連する英単語を15個生成してください。
-    難易度はCEFRの「${cefrLevel}」レベルに厳密に合わせてください。各単語には、そのレベルにふさわしい英語の例文を1つ添えてください。`;
+    // 3. プロンプトの構築
+    const prompt = `
+      You are an expert English teacher. 
+      Generate exactly 15 English vocabulary words related to the topic: "${topic}".
+      The difficulty must strictly match CEFR level: "${cefrLevel}".
+      For each word, provide:
+      1. The word itself.
+      2. Its Japanese meaning.
+      3. A clear, natural English example sentence suitable for the ${cefrLevel} level.
+    `;
 
+    // 4. API呼び出し
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await result.response;
+    const text = response.text();
+
+    // 5. JSONのパース
     const words = JSON.parse(text);
 
     return NextResponse.json({ words });
+
   } catch (error: any) {
-    console.error("API Error:", error);
-    return NextResponse.json({ error: '生成エラー', details: error.message }, { status: 500 });
+    console.error("Gemini API Error:", error);
+    
+    // エラーの種類に応じたメッセージを返す
+    let status = 500;
+    let message = "単語の生成に失敗しました。";
+    
+    if (error.message?.includes("503")) {
+      message = "AIサーバーが混雑しています。少し時間を置いて再試行してください。";
+      status = 503;
+    } else if (error.message?.includes("404")) {
+      message = "指定されたモデルが見つかりません。";
+      status = 404;
+    }
+
+    return NextResponse.json({ error: message, details: error.message }, { status });
   }
 }
