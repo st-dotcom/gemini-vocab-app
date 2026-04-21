@@ -54,16 +54,24 @@
   }
 
   .btn-action-primary {
-    @apply px-8 py-4 rounded-3xl font-bold tracking-tight transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-lg;
-    background: #4f46e5; /* Indigo 600 */
-    border: 1px solid #4338ca;
+    @apply px-8 py-5 rounded-[2rem] font-black text-xl tracking-wider transition-all duration-300 active:scale-95 shadow-xl;
+    background: #3730a3; /* Indigo 800 - 深い青で白文字を強調 */
+    color: #ffffff !important;
+    border: none;
+  }
+
+  .btn-action-primary:disabled {
+    @apply opacity-100 cursor-not-allowed;
+    background: #e2e8f0; /* 明るいグレー */
+    color: #94a3b8 !important; /* 暗いグレーの文字 */
   }
 
   .btn-action-primary:hover:not(:disabled) {
-    @apply shadow-indigo-200/50 -translate-y-1 opacity-100;
-    background: #4338ca; /* Indigo 700 */
-    box-shadow: 0 12px 24px -6px rgba(67, 56, 202, 0.4);
+    @apply -translate-y-1 opacity-100;
+    background: #312e81; /* Indigo 900 */
+    box-shadow: 0 20px 25px -5px rgba(49, 46, 129, 0.3);
   }
+
 
 
   .animate-reveal {
