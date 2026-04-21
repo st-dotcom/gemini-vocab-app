@@ -1,8 +1,11 @@
+import { Outfit } from 'next/font/google'
 import './globals.css'
 
+const outfit = Outfit({ subsets: ['latin'] })
+
 export const metadata = {
-  title: '英語学習アプリ',
-  description: 'Geminiを活用した適応型英単語アプリ',
+  title: 'Gemini 英単語学習',
+  description: 'AIを活用した次世代の適応型英単語アプリ',
 }
 
 export default function RootLayout({
@@ -12,7 +15,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body className={outfit.className}>{children}</body>
     </html>
   )
 }
+
