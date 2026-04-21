@@ -130,11 +130,8 @@ export default function Home() {
           <div className="space-y-8 animate-reveal">
             {/* 1. Header & Welcome */}
             <div className="text-center space-y-4">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 mb-2">
-                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">AI Language Tutor</span>
-              </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-gradient-pastel">
-                Gemini Vocab
+                AI CEFR Tutor
               </h1>
               <p className="text-slate-600 font-medium max-w-lg mx-auto leading-relaxed">
                 あなたの興味に合わせてAIが英単語をセレクト。<br className="hidden sm:block" />
@@ -241,14 +238,9 @@ export default function Home() {
             {/* Word Card */}
             <div className="pastel-card p-12 sm:p-20 rounded-[3rem] flex flex-col items-center justify-center text-center bg-white">
               <div className="px-4 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-full uppercase tracking-widest mb-6">{currentLevel} VOCABULARY</div>
-              <h2 className="text-5xl sm:text-7xl font-black text-slate-900 tracking-tighter mb-8 break-words leading-none">
+              <h2 className="text-5xl sm:text-7xl font-black text-slate-900 tracking-tighter break-words leading-none">
                 {words[currentIndex].word}
               </h2>
-              <div className="flex gap-4">
-                <button className="w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition-all border border-slate-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                </button>
-              </div>
             </div>
 
             {!showMeaning ? (
