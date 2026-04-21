@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const LEVEL_DESCRIPTIONS: Record<string, {label: string, detail: string, icon: string}> = {
+const LEVEL_DESCRIPTIONS: Record<string, { label: string, detail: string, icon: string }> = {
   'A1': { label: 'Beginner (初級)', detail: '自己紹介や基本的な挨拶、ごく簡単なやり取りができるレベル。', icon: '🌱' },
   'A2': { label: 'Elementary (初中級)', detail: '日常生活や身近な話題について、直接的な情報交換ができるレベル。', icon: '📝' },
   'B1': { label: 'Intermediate (中級)', detail: '仕事や旅行での一般的な事態に対処し、自分の意見を述べられるレベル。', icon: '💬' },
@@ -48,7 +48,7 @@ export default function Home() {
         body: JSON.stringify({ topic, cefrLevel: currentLevel }),
       });
       const data = await res.json();
-      
+
       if (res.ok && data.words) {
         setWords(data.words);
         setCurrentIndex(0);
@@ -102,7 +102,7 @@ export default function Home() {
     } else {
       setLevelChange('stay');
     }
-    
+
     nextLevel = CEFR_LEVELS[levelIndex];
     setCurrentLevel(nextLevel);
     localStorage.setItem('cefrLevel', nextLevel);
@@ -113,9 +113,9 @@ export default function Home() {
     const parts = example.split(new RegExp(`(${word})`, 'gi'));
     return (
       <span>
-        {parts.map((part, i) => 
-          part.toLowerCase() === word.toLowerCase() 
-            ? <b key={i} className="text-indigo-600 border-b-2 border-indigo-200">{part}</b> 
+        {parts.map((part, i) =>
+          part.toLowerCase() === word.toLowerCase()
+            ? <b key={i} className="text-indigo-600 border-b-2 border-indigo-200">{part}</b>
             : part
         )}
       </span>
@@ -125,7 +125,7 @@ export default function Home() {
   return (
     <main className="min-h-screen py-6 px-4 sm:px-6 md:py-12">
       <div className="max-w-2xl mx-auto space-y-8">
-        
+
         {quizState === 'input' && (
           <div className="space-y-8 animate-reveal">
             {/* 1. Header & Welcome */}
@@ -168,7 +168,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 p-4 bg-white/80 rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-indigo-200">
                     <div className="w-14 h-14 flex flex-col items-center justify-center bg-indigo-600 rounded-xl text-white">
-                      <span className="text-[10px] font-bold opacity-80 leading-none">LEVEL</span>
+                      <span className="text-[10px] font-bold opacity-80 leading-none">LEVEL：</span>
                       <span className="text-2xl font-black leading-none mt-0.5">{currentLevel}</span>
                     </div>
                     <div>
@@ -206,7 +206,7 @@ export default function Home() {
                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] whitespace-nowrap">CEFR Level Guide</h3>
                 <div className="h-px bg-slate-200 flex-grow"></div>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8">
                 {CEFR_LEVELS.map((level) => (
                   <div key={level} className={`p-4 rounded-2xl border transition-all ${currentLevel === level ? 'bg-indigo-50/50 border-indigo-200 shadow-sm ring-1 ring-indigo-200' : 'bg-white border-slate-100 hover:border-slate-300 opacity-70'}`}>
@@ -240,7 +240,7 @@ export default function Home() {
 
             {/* Word Card */}
             <div className="pastel-card p-12 sm:p-20 rounded-[3rem] flex flex-col items-center justify-center text-center bg-white">
-               <div className="px-4 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-full uppercase tracking-widest mb-6">{currentLevel} VOCABULARY</div>
+              <div className="px-4 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-full uppercase tracking-widest mb-6">{currentLevel} VOCABULARY</div>
               <h2 className="text-5xl sm:text-7xl font-black text-slate-900 tracking-tighter mb-8 break-words leading-none">
                 {words[currentIndex].word}
               </h2>
@@ -253,15 +253,15 @@ export default function Home() {
 
             {!showMeaning ? (
               <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => handleAnswer(false)} 
+                <button
+                  onClick={() => handleAnswer(false)}
                   className="btn-pastel p-8 flex flex-col items-center gap-3 hover:bg-rose-50 hover:border-rose-200 transition-all rounded-[2.5rem]"
                 >
                   <div className="w-12 h-12 flex items-center justify-center bg-rose-100 text-rose-500 rounded-2xl text-xl">✕</div>
                   <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Don't Know</span>
                 </button>
-                <button 
-                  onClick={() => handleAnswer(true)} 
+                <button
+                  onClick={() => handleAnswer(true)}
                   className="btn-pastel p-8 flex flex-col items-center gap-3 hover:bg-emerald-50 hover:border-emerald-200 transition-all rounded-[2.5rem]"
                 >
                   <div className="w-12 h-12 flex items-center justify-center bg-emerald-100 text-emerald-500 rounded-2xl text-xl">✓</div>
@@ -300,19 +300,19 @@ export default function Home() {
 
             <div className="flex flex-col items-center justify-center gap-3">
               <div className="text-7xl font-black text-indigo-600 tracking-tighter">
-                {Math.round((correctCount/words.length)*100)}<span className="text-2xl text-slate-300 ml-1">%</span>
+                {Math.round((correctCount / words.length) * 100)}<span className="text-2xl text-slate-300 ml-1">%</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-1 bg-slate-50 rounded-full border border-slate-100">
-                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{correctCount} / {words.length} Accurate</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{correctCount} / {words.length} Accurate</span>
               </div>
             </div>
 
             <div className="p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 space-y-6">
               <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Mastery Transition</div>
-              
+
               <div className="flex items-center justify-center gap-6">
-                 {levelChange === 'up' && (
+                {levelChange === 'up' && (
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-4xl animate-bounce">🆙</span>
                     <p className="text-xl font-black text-emerald-600">Level Up!</p>
@@ -331,26 +331,26 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              
+
               <div className="pt-4 flex items-center justify-center gap-8 border-t border-white">
-                 <div className="text-center">
-                   <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Was</p>
-                   <p className="text-3xl font-black text-slate-300">
+                <div className="text-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Was</p>
+                  <p className="text-3xl font-black text-slate-300">
                     {CEFR_LEVELS[Math.max(0, CEFR_LEVELS.indexOf(currentLevel) - (levelChange === 'up' ? 1 : 0) + (levelChange === 'down' ? 1 : 0))]}
-                   </p>
-                 </div>
-                 <div className="text-slate-200">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-                 </div>
-                 <div className="text-center">
-                   <p className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Now</p>
-                   <p className="text-3xl font-black text-indigo-600">{currentLevel}</p>
-                 </div>
+                  </p>
+                </div>
+                <div className="text-slate-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Now</p>
+                  <p className="text-3xl font-black text-indigo-600">{currentLevel}</p>
+                </div>
               </div>
             </div>
 
-            <button 
-              onClick={() => {setTopic(''); setQuizState('input');}} 
+            <button
+              onClick={() => { setTopic(''); setQuizState('input'); }}
               className="btn-action-primary w-full text-lg py-5"
             >
               新しいテーマで再開する
